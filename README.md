@@ -17,29 +17,6 @@ A static site for exploring ESA internship opportunities, with technical, engine
 
 No backend: all data processing happens during `npm run build`.
 
-## Data contract
-
-The site reads `data/ESA_intern_jobs_full_enriched.csv` exactly as the scraper (`esa_jobs_scraper.py`) writes it. The CSV is never modified.
-
-| Column(s) | Format | How it is used |
-|---|---|---|
-| `description_html` | HTML | Primary source for all sections (works for 2025 files, where `sections` is `{}`) |
-| `sections`, `schema_org` | Python dict literal | Fallback sections; schema.org dates |
-| `bullets`, `competencies`, `nationality_restrictions`, `contact_emails` | Python list literal | Parsed with `src/lib/pyLiteral.js` (not JSON) |
-| `closing_date`, `date_posted` | `Mon Nov 30 23:00:00 UTC 2026` | Deadline / posting date |
-| `Closing Date` | `30 November 2026 23:59 CET/CEST` | Shown to users; the earlier of the two closing times is used |
-| `date_scraped` | `2026-11-03 13:44:14.986851+00:00` | "Data from …" in the header |
-| `apply_url` | relative path | Prefixed with `https://jobs.esa.int` |
-
-All 25 columns must be present (the build fails with a clear message otherwise); extra columns, such as the scraper's `--extra` ones, are ignored. Each build prints a coverage report:
-
-```
-[jobs] 112 rows loaded
-[jobs] sections from: html 112, sections column 0, plain text 0
-[jobs] focus: technical 71, mixed 9, non-technical 32
-[jobs] disciplines: Software & IT 30, ...
-```
-
 ## Classification
 
 Field tags ("disciplines"), the technical/mixed/non-technical focus and the skill chips come from keyword rules in **`src/lib/taxonomy.js`** — plain data, meant to be edited. Every tag records the keywords that triggered it, and each internship page shows them under "Why these tags?".
