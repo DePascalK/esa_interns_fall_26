@@ -1,0 +1,30 @@
+---
+/**
+ * Overview tab: where are the internships, by field and site? The grid and
+ * bars are drawn in the browser (scripts/overview.js) from the cards, so
+ * they follow the current search and filters.
+ */
+const { meta } = Astro.props;
+const facetMeta = JSON.stringify({
+  disciplines: meta.disciplines.map(({ id, label, technical }) => ({ id, label, technical })),
+  sites: meta.sites.map(({ id, name, city, label }) => ({ id, name, city, label })),
+  directorates: meta.directorates.map(({ id, label }) => ({ id, label })),
+}).replace(/</g, '\\u003c');
+---
+
+<div class="overview">
+  <p class="overview-intro" id="overview-intro"></p>
+
+  <section class="overview-block" aria-labelledby="ov-grid-title">
+    <h2 id="ov-grid-title">Field × site</h2>
+    <p class="muted">Each cell counts the internships in that field at that site. Select a cell, a field or a site to see the list.</p>
+    <div class="table-scroll" id="overview-grid"></div>
+  </section>
+
+  <section class="overview-block" aria-labelledby="ov-dir-title">
+    <h2 id="ov-dir-title">By directorate</h2>
+    <div id="overview-dirs" class="bars"></div>
+  </section>
+
+  <script type="application/json" id="facet-meta" set:html={facetMeta}></script>
+</div>

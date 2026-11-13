@@ -1,151 +1,56 @@
 ---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SearchBar from '../components/SearchBar.astro';
+import Facets from '../components/Facets.astro';
+import JobList from '../components/JobList.astro';
+import CommonInfo from '../components/CommonInfo.astro';
+import Overview from '../components/Overview.astro';
 import { loadJobs } from '../lib/jobLoader.js';
-import JobGraph from '../components/JobGraph.astro';
-import Search from '../components/Search.astro';
-import '../styles/global.css';
+import { withBase } from '../lib/paths.js';
 
-const allJobs = await loadJobs();
+const { jobs, meta } = await loadJobs();
+const technicalCount = jobs.filter((j) => j.focus === 'technical').length;
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ESA Internships Explorer</title>
-  <meta name="description" content="Explore ESA internship opportunities through interactive visualization and search">
-  <script is:inline define:vars={{ allJobs }}>
-    window.__JOBS_DATA__ = allJobs;
+<BaseLayout count={meta.count} dataAsOfDay={meta.dataAsOfDay}>
+  <section class="intro">
+    <h1>Find your ESA internship</h1>
+    <p>
+      {meta.count} internships across {meta.sites.length} sites, {technicalCount} of them technical, engineering or
+      science roles — listed first. Filter by field, site and eligibility, or search for the tools and topics you know.
+    </p>
+  </section>
+
+  <div
+    id="app"
+    data-index-url={withBase('search-index.json')}
+    data-data-as-of={meta.dataAsOfDay}
+  >
+    <div class="tabs" role="tablist" aria-label="Views">
+      <button type="button" role="tab" id="tab-explore" aria-controls="panel-explore" aria-selected="true">List</button>
+      <button type="button" role="tab" id="tab-overview" aria-controls="panel-overview" aria-selected="false" tabindex="-1">Overview</button>
+    </div>
+
+    <p class="notice" id="notice" role="status" hidden></p>
+
+    <section id="panel-explore" role="tabpanel" aria-labelledby="tab-explore">
+      <div class="explore">
+        <Facets meta={meta} />
+        <div class="results">
+          <SearchBar />
+          <JobList jobs={jobs} />
+        </div>
+      </div>
+      <CommonInfo common={meta.common} />
+    </section>
+
+    <section id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" hidden>
+      <Overview meta={meta} />
+    </section>
+  </div>
+
+  <script>
+    import { initExplorer } from '../scripts/state.js';
+    initExplorer();
   </script>
-</head>
-<body>
-  <header>
-    <h1>🚀 ESA Fall 2025 Internships Explorer</h1>
-    <p>Explore {allJobs.length} internship opportunities at the European Space Agency</p>
-    <div class="search-hint">Press <kbd>Cmd</kbd>+<kbd>K</kbd> or <kbd>Ctrl</kbd>+<kbd>K</kbd> to search</div>
-  </header>
-
-  <main>
-    <JobGraph jobs={allJobs} />
-  </main>
-
-  <footer>
-    <p>Site not affiliated with ESA | Data sourced from ESA Career Portal | Last updated November 2025</p>
-  </footer>
-
-  <Search jobs={allJobs} />
-</body>
-</html>
-
-<style>
-  header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    text-align: center;
-    padding: var(--header-padding-y) var(--header-padding-x);
-    background: rgba(10, 10, 10, 0.95);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border);
-    z-index: var(--z-header);
-    height: var(--header-height);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: var(--spacing-xs);
-  }
-
-  header h1 {
-    font-size: 1.5rem;
-    color: var(--primary-blue);
-    margin: 0;
-    line-height: 1.2;
-  }
-
-  header p {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    margin: 0;
-    line-height: 1.4;
-  }
-
-  .search-hint {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    margin: 0;
-  }
-
-  .search-hint kbd {
-    background: var(--bg-hover);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 0.15rem 0.4rem;
-    font-family: monospace;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-  }
-
-  main {
-    margin: 0;
-    padding: 0;
-  }
-
-  footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    text-align: center;
-    padding: var(--spacing-sm) var(--spacing-md);
-    background: rgba(10, 10, 10, 0.95);
-    backdrop-filter: blur(10px);
-    border-top: 1px solid var(--border);
-    color: var(--text-muted);
-    font-size: 0.8rem;
-    z-index: var(--z-header);
-  }
-
-  @media (max-width: 768px) {
-    header {
-      height: 4.5rem;
-      padding: var(--spacing-sm) var(--spacing-md);
-    }
-
-    header h1 {
-      font-size: 1.2rem;
-    }
-    
-    header p {
-      font-size: 0.8rem;
-    }
-
-    .search-hint {
-      font-size: 0.7rem;
-    }
-
-    footer {
-      font-size: 0.7rem;
-      padding: var(--spacing-xs) var(--spacing-sm);
-    }
-  }
-
-  @media (max-width: 480px) {
-    header {
-      height: 4rem;
-    }
-
-    header h1 {
-      font-size: 1.1rem;
-    }
-
-    header p {
-      font-size: 0.75rem;
-    }
-
-    .search-hint {
-      display: none;
-    }
-  }
-</style>
+</BaseLayout>

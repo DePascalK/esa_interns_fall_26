@@ -1,0 +1,28 @@
+---
+/** Renders description blocks: paragraphs (lines joined with <br>) and lists. */
+interface Props {
+  blocks: Array<{ type: 'p'; lines: string[] } | { type: 'list'; ordered: boolean; items: string[] }>;
+}
+const { blocks = [] } = Astro.props;
+---
+
+{
+  blocks.map((b) =>
+    b.type === 'list' ? (
+      b.ordered ? (
+        <ol>{b.items.map((item) => <li>{item}</li>)}</ol>
+      ) : (
+        <ul>{b.items.map((item) => <li>{item}</li>)}</ul>
+      )
+    ) : (
+      <p>
+        {b.lines.map((line, i) => (
+          <>
+            {i > 0 && <br />}
+            {line}
+          </>
+        ))}
+      </p>
+    ),
+  )
+}

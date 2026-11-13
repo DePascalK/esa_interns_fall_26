@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import JobDetail from '../../components/JobDetail.astro';
+import { loadJobs } from '../../lib/jobLoader.js';
+
+/** One static page per internship: shareable links, back button, search-engine indexing. */
+export async function getStaticPaths() {
+  const { jobs, meta } = await loadJobs();
+  return jobs.map((job) => ({ params: { id: job.id }, props: { job, meta } }));
+}
+
+const { job, meta } = Astro.props;
+const description = job.summary || `${job.title} — ESA internship at ${job.site.label}`;
+---
+
+<BaseLayout
+  title={`${job.headline} · ESA Internship Explorer`}
+  description={description}
+  count={meta.count}
+  dataAsOfDay={meta.dataAsOfDay}
+>
+  <JobDetail job={job} meta={meta} />
+
+  <script>
+    import { initDetail } from '../../scripts/detail.js';
+    initDetail();
+  </script>
+</BaseLayout>

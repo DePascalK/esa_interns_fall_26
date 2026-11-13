@@ -1,0 +1,106 @@
+---
+/**
+ * Filter sidebar. Options are rendered at build time; counts and disabled
+ * states are updated in the browser by scripts/state.js.
+ */
+const { meta } = Astro.props;
+const technical = meta.disciplines.filter((d) => d.technical);
+const nonTechnical = meta.disciplines.filter((d) => !d.technical);
+---
+
+<aside class="facets" id="facets" aria-label="Filters">
+  <div class="facets-head">
+    <h2>Filters</h2>
+    <button type="button" class="link-btn" id="clear-all">Clear all</button>
+  </div>
+
+  <fieldset class="facet">
+    <legend>Status</legend>
+    <label class="opt"><input type="radio" name="status" value="open" checked /> <span class="opt-label">Open</span> <span class="opt-count" data-count-for="status:open"></span></label>
+    <label class="opt"><input type="radio" name="status" value="soon" /> <span class="opt-label">Closing within 7 days</span> <span class="opt-count" data-count-for="status:soon"></span></label>
+    <label class="opt"><input type="radio" name="status" value="all" /> <span class="opt-label">All, including closed</span> <span class="opt-count" data-count-for="status:all"></span></label>
+  </fieldset>
+
+  <fieldset class="facet">
+    <legend>Focus</legend>
+    {meta.focus.map((f) => (
+      <label class="opt">
+        <input type="checkbox" name="focus" value={f.id} />
+        <span class={`opt-label focus-dot focus-${f.id}`}>{f.label}</span>
+        <span class="opt-count" data-count-for={`focus:${f.id}`}>{f.count}</span>
+      </label>
+    ))}
+  </fieldset>
+
+  <fieldset class="facet">
+    <legend>Field</legend>
+    {technical.length > 0 && <p class="facet-sub">Technical & science</p>}
+    {technical.map((d) => (
+      <label class="opt">
+        <input type="checkbox" name="disc" value={d.id} />
+        <span class="opt-label">{d.label}</span>
+        <span class="opt-count" data-count-for={`disc:${d.id}`}>{d.count}</span>
+      </label>
+    ))}
+    {nonTechnical.length > 0 && <p class="facet-sub">Other fields</p>}
+    {nonTechnical.map((d) => (
+      <label class="opt">
+        <input type="checkbox" name="disc" value={d.id} />
+        <span class="opt-label">{d.label}</span>
+        <span class="opt-count" data-count-for={`disc:${d.id}`}>{d.count}</span>
+      </label>
+    ))}
+  </fieldset>
+
+  <fieldset class="facet">
+    <legend>Site</legend>
+    {meta.sites.map((s) => (
+      <label class="opt">
+        <input type="checkbox" name="site" value={s.id} />
+        <span class="opt-label">{s.label}</span>
+        <span class="opt-count" data-count-for={`site:${s.id}`}>{s.count}</span>
+      </label>
+    ))}
+  </fieldset>
+
+  <fieldset class="facet">
+    <legend>Directorate</legend>
+    {meta.directorates.map((d) => (
+      <label class="opt">
+        <input type="checkbox" name="dir" value={d.id} />
+        <span class="opt-label">{d.label}</span>
+        <span class="opt-count" data-count-for={`dir:${d.id}`}>{d.count}</span>
+      </label>
+    ))}
+  </fieldset>
+
+  <fieldset class="facet">
+    <legend>Eligibility</legend>
+    <label class="field-label" for="nat-select">My nationality</label>
+    <select id="nat-select">
+      <option value="">Any nationality</option>
+      {meta.countries.map((c) => <option value={c.code}>{c.name}</option>)}
+    </select>
+    <p class="facet-note">Hides postings whose eligibility list excludes this country. Remembered on this device.</p>
+    {meta.exportControlCount > 0 && (
+      <label class="opt">
+        <input type="checkbox" id="noec-check" />
+        <span class="opt-label">Hide postings requiring export-control eligibility</span>
+        <span class="opt-count" data-count-for="ec:yes">{meta.exportControlCount}</span>
+      </label>
+    )}
+  </fieldset>
+
+  <fieldset class="facet">
+    <legend>Shortlist</legend>
+    <label class="opt">
+      <input type="checkbox" id="short-check" />
+      <span class="opt-label">Shortlisted only</span>
+      <span class="opt-count" id="short-count">0</span>
+    </label>
+    <button type="button" class="btn btn-small" id="short-export">Copy shortlist links</button>
+    <p class="facet-note" id="short-feedback" aria-live="polite"></p>
+  </fieldset>
+
+  <button type="button" class="btn btn-primary facets-done" id="facets-done">Show results</button>
+</aside>

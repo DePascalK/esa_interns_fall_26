@@ -1,0 +1,65 @@
+---
+import '../styles/global.css';
+import { withBase } from '../lib/paths.js';
+
+interface Props {
+  title?: string;
+  description?: string;
+  count: number;
+  dataAsOfDay?: string;
+}
+
+const {
+  title = 'ESA Internship Explorer',
+  description = 'Explore ESA internship opportunities: filter by field, site and eligibility, with technical, engineering and science internships first.',
+  count,
+  dataAsOfDay,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='4.5' fill='%235aa8ff'/%3E%3Cellipse cx='12' cy='12' rx='10.5' ry='4.2' fill='none' stroke='%235aa8ff' stroke-width='1.8' transform='rotate(-24 12 12)'/%3E%3C/svg%3E"
+    />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href={withBase('')}>
+          <svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="4.2" fill="currentColor"></circle>
+            <ellipse cx="12" cy="12" rx="10.5" ry="4.2" fill="none" stroke="currentColor" stroke-width="1.6" transform="rotate(-24 12 12)"></ellipse>
+          </svg>
+          <span>ESA Internship Explorer</span>
+        </a>
+        <p class="data-stamp">
+          {count} internship{count === 1 ? '' : 's'}{dataAsOfDay && <> · data from <time>{dataAsOfDay}</time></>}
+        </p>
+      </div>
+    </header>
+
+    <main id="main" class="container">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>
+          Independent project, not affiliated with or endorsed by the European Space Agency (ESA).
+          Data comes from the public <a href="https://jobs.esa.int" rel="noopener">ESA careers portal</a>
+          {dataAsOfDay && <>as of {dataAsOfDay}</>}. Tags and summaries are generated automatically —
+          always check the original posting before applying.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

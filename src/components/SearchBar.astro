@@ -1,0 +1,42 @@
+---
+/** Search input, sort, result count and active-filter chips (the toolbar above the list). */
+---
+
+<div class="toolbar">
+  <div class="search-row">
+    <label class="search-field" for="search-input">
+      <svg viewBox="0 0 20 20" aria-hidden="true" class="icon"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"></circle><path d="M12.7 12.7L17 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>
+      <span class="visually-hidden">Search internships</span>
+      <input
+        id="search-input"
+        type="search"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder="Search topics, skills, tools — e.g. FPGA, PyTorch, antenna, GNSS"
+        aria-describedby="search-help"
+      />
+      <kbd class="search-kbd" aria-hidden="true">Ctrl K</kbd>
+    </label>
+    <button type="button" class="btn facets-toggle" id="facets-toggle" aria-controls="facets" aria-expanded="false">
+      Filters <span class="facets-toggle-count" id="facets-toggle-count"></span>
+    </button>
+  </div>
+  <p id="search-help" class="visually-hidden">
+    All words must match. Abbreviations such as ML, RF, GNC or EO also find their full forms.
+  </p>
+
+  <div class="results-bar">
+    <p class="result-count" id="result-count" aria-live="polite"></p>
+    <label class="sort">
+      <span>Sort</span>
+      <select id="sort-select">
+        <option value="relevance" disabled>Best match</option>
+        <option value="tech">Technical first</option>
+        <option value="closing">Closing soonest</option>
+        <option value="newest">Newest</option>
+        <option value="az">A–Z</option>
+      </select>
+    </label>
+  </div>
+  <div class="active-filters" id="active-filters" aria-label="Active filters"></div>
+</div>

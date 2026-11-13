@@ -1,0 +1,158 @@
+---
+import Blocks from './Blocks.astro';
+import CommonInfo from './CommonInfo.astro';
+import { withBase } from '../lib/paths.js';
+import { FOCUS } from '../lib/taxonomy.js';
+import { COUNTRY_BY_CODE } from '../lib/reference.js';
+
+const { job, meta } = Astro.props;
+const name = (code) => COUNTRY_BY_CODE[code]?.name || code;
+const nat = job.nationality;
+const s = job.sections;
+---
+
+<article class="detail" data-id={job.id}>
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href={withBase('')} id="back-link">
+      <svg viewBox="0 0 16 16" aria-hidden="true" class="icon"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      All internships
+    </a>
+  </nav>
+
+  <header class="detail-head">
+    <p class="detail-kicker">
+      <span class={`focus-tag focus-${job.focus}`}>{FOCUS[job.focus].label}</span>
+      <span>{[job.department, job.unit].filter(Boolean).join(' · ')}</span>
+    </p>
+    <h1>{job.headline}</h1>
+    {job.title !== job.headline && <p class="detail-title">ESA title: {job.title}</p>}
+    <ul class="chips">
+      {job.disciplines.map((d) => <li class={`chip ${d.technical ? 'chip-tech' : 'chip-nontech'}`}>{d.label}</li>)}
+    </ul>
+  </header>
+
+  <div class="detail-grid">
+    <aside class="facts" aria-label="Key facts">
+      <div class="facts-card">
+        <dl>
+          <div>
+            <dt>Deadline</dt>
+            <dd>
+              <span class="deadline js-status" data-closes={job.closesAt ?? ''}>
+                <span class="status-date">{job.closesDay || 'Not stated'}</span>
+                <span class="status-rel"></span>
+              </span>
+              {job.closesLabel && <small class="muted">{job.closesLabel}</small>}
+            </dd>
+          </div>
+          <div>
+            <dt>Site</dt>
+            <dd>{job.site.locationLine || job.site.label}</dd>
+          </div>
+          <div><dt>Directorate</dt><dd>{job.directorate}</dd></div>
+          {job.postedDay && <div><dt>Posted</dt><dd>{job.postedDay}</dd></div>}
+          {job.requisitionId && <div><dt>Requisition ID</dt><dd>{job.requisitionId}</dd></div>}
+        </dl>
+
+        <div class="actions">
+          <a class="btn btn-primary" href={job.applyUrl} target="_blank" rel="noopener noreferrer" data-apply data-closes={job.closesAt ?? ''}>Apply on ESA careers ↗</a>
+          <a class="btn" href={job.url} target="_blank" rel="noopener noreferrer">Original posting ↗</a>
+          <button class="btn star star-wide" type="button" data-shortlist-toggle={job.id} aria-pressed="false" aria-label="Add to shortlist">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.6l2.2 4.6 5 .6-3.7 3.5.9 5-4.4-2.4-4.4 2.4.9-5L2.8 7.8l5-.6z"></path></svg>
+            <span class="star-text">Shortlist</span>
+          </button>
+        </div>
+      </div>
+
+      {(job.exportControl || job.notes.length > 0) && (
+        <div class="facts-card notes">
+          <h2>Good to know</h2>
+          {job.exportControl && (
+            <p class="flag flag-ec">Export-control eligibility required</p>
+          )}
+          <ul>{job.notes.map((n) => <li>{n}</li>)}</ul>
+        </div>
+      )}
+
+      <div class="facts-card">
+        <h2>Eligible nationalities</h2>
+        {!nat.known && <p class="muted">Not stated in the posting — check the original.</p>}
+        {nat.isStandard && <p>The usual ESA list ({nat.codes.length} states).</p>}
+        {nat.known && !nat.isStandard && (
+          <>
+            {nat.added.length > 0 && <p><strong>Also open to:</strong> {nat.added.map(name).join(', ')}</p>}
+            {nat.removed.length > 0 && <p><strong>Not open to:</strong> {nat.removed.map(name).join(', ')}</p>}
+          </>
+        )}
+        {nat.known && (
+          <details>
+            <summary>Full list</summary>
+            <p>{nat.codes.map(name).join(', ')}</p>
+          </details>
+        )}
+        <p class="eligibility-check" id="eligibility-check" data-nat={nat.codes.join(' ')} hidden></p>
+      </div>
+
+      {job.skills.length > 0 && (
+        <div class="facts-card">
+          <h2>Skills and tools mentioned</h2>
+          <ul class="chips">{job.skills.map((sk) => <li class="chip chip-skill">{sk}</li>)}</ul>
+        </div>
+      )}
+    </aside>
+
+    <div class="detail-main">
+      {s.tasks.length > 0 && (
+        <section class="detail-section">
+          <h2>What you'll do</h2>
+          <Blocks blocks={s.tasks} />
+        </section>
+      )}
+
+      <section class="detail-section">
+        <h2>What you need</h2>
+        {s.requirements.length > 0 ? <Blocks blocks={s.requirements} /> : <p class="muted">No posting-specific requirements beyond the standard ones.</p>}
+        {job.educationDeviates && s.education.length > 0 ? (
+          <div class="callout">
+            <h3>Education (differs from the usual requirement)</h3>
+            <Blocks blocks={s.education} />
+          </div>
+        ) : (
+          <p class="muted">Plus the standard education and language requirements under “Applies to all ESA internships”.</p>
+        )}
+        {job.competencies.length > 0 && (
+          <div class="callout">
+            <h3>Behavioural competencies (posting-specific)</h3>
+            <ul class="chips">{job.competencies.map((c) => <li class="chip chip-skill">{c}</li>)}</ul>
+          </div>
+        )}
+      </section>
+
+      {s.other.map((o) => (
+        <section class="detail-section">
+          <h2>{o.heading}</h2>
+          <Blocks blocks={o.blocks} />
+        </section>
+      ))}
+
+      {s.team.length > 0 && (
+        <details class="detail-section detail-collapsible">
+          <summary><h2>About the team</h2></summary>
+          <Blocks blocks={s.team} />
+        </details>
+      )}
+
+      <details class="detail-section detail-collapsible why">
+        <summary><h2>Why these tags?</h2></summary>
+        <p class="muted">Tags are assigned automatically from keywords in the title, topic, tasks and requirements.</p>
+        <ul>
+          {job.disciplines.map((d) => (
+            <li><strong>{d.label}</strong>{d.keywords.length > 0 ? <>: {d.keywords.map((k) => k.replace(/\*$/, '…')).join(', ')}</> : ' (no specific keywords)'}</li>
+          ))}
+        </ul>
+      </details>
+
+      <CommonInfo common={meta.common} />
+    </div>
+  </div>
+</article>

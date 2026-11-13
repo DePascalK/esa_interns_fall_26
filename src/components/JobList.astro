@@ -1,0 +1,17 @@
+---
+import JobCard from './JobCard.astro';
+const { jobs } = Astro.props;
+---
+
+<ul id="job-list" class="job-list" aria-label="Internships">
+  {jobs.map((job, i) => <JobCard job={job} rank={i} />)}
+</ul>
+
+<div id="empty-state" class="empty-state" hidden>
+  <p class="empty-title">No internships match these filters.</p>
+  <p class="empty-hint" id="empty-hint"></p>
+  <div class="empty-actions">
+    <button type="button" class="btn" id="empty-undo">Remove last filter</button>
+    <button type="button" class="btn btn-ghost" id="empty-clear">Clear all filters</button>
+  </div>
+</div>

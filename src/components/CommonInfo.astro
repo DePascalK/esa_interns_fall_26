@@ -1,0 +1,65 @@
+---
+/**
+ * Text that is the same for (nearly) every posting, shown once instead of
+ * repeated on each job. Built from the dataset by lib/boilerplate.js.
+ */
+import Blocks from './Blocks.astro';
+import { sentences, flattenBlocks } from '../lib/sections.js';
+
+const { common, open = false } = Astro.props;
+const diversityLead = sentences(flattenBlocks(common.diversity)).slice(0, 2).join(' ');
+---
+
+<section class="common" id="common-info">
+  <details open={open}>
+    <summary>
+      <h2>Applies to all ESA internships</h2>
+      <span class="common-hint">Standard requirements and conditions, left out of the individual postings</span>
+    </summary>
+    <div class="common-grid">
+      {common.education.length > 0 && (
+        <div class="common-item">
+          <h3>Education</h3>
+          <Blocks blocks={common.education} />
+        </div>
+      )}
+      {common.requirements.length > 0 && (
+        <div class="common-item">
+          <h3>Languages and interview</h3>
+          <ul>{common.requirements.map((r) => <li>{r}</li>)}</ul>
+        </div>
+      )}
+      {common.competencies.length > 0 && (
+        <div class="common-item">
+          <h3>Behavioural competencies</h3>
+          <ul class="chips">{common.competencies.map((c) => <li class="chip chip-skill">{c}</li>)}</ul>
+          <p class="muted">
+            See ESA's <a href="https://esamultimedia.esa.int/docs/careers/ESA_Competency_Framework.pdf" rel="noopener">competency framework</a>.
+          </p>
+        </div>
+      )}
+      {common.nationalityNames.length > 0 && (
+        <div class="common-item">
+          <h3>Usual eligible nationalities</h3>
+          <p>{common.nationalityNames.join(', ')}.</p>
+          <p class="muted">Postings that differ from this list are marked.</p>
+        </div>
+      )}
+      {common.disclaimer.length > 0 && (
+        <div class="common-item">
+          <h3>Selection and conditions</h3>
+          <ul>{common.disclaimer.map((d) => <li>{d}</li>)}</ul>
+        </div>
+      )}
+      {(diversityLead || common.contactEmail) && (
+        <div class="common-item">
+          <h3>Diversity and accessibility</h3>
+          {diversityLead && <p>{diversityLead}</p>}
+          {common.contactEmail && (
+            <p>Contact: <a href={`mailto:${common.contactEmail}`}>{common.contactEmail}</a></p>
+          )}
+        </div>
+      )}
+    </div>
+  </details>
+</section>

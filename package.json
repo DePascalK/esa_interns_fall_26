@@ -1,21 +1,26 @@
 {
-  "name": "esa_interns_fall_25",
-  "version": "1.0.0",
-  "description": "For exploration of these opportunities",
+  "name": "esa-internship-explorer",
+  "version": "2.0.0",
+  "description": "Static site to explore ESA internship opportunities, with an emphasis on technical, engineering and science internships",
   "type": "module",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "vitest run",
+    "report": "node scripts/report.mjs"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "astro": "^5.15.4",
-    "d3": "^7.9.0",
-    "fuse.js": "^7.1.0",
+    "astro": "^5.18.2",
+    "minisearch": "^7.2.0",
+    "node-html-parser": "^9.0.7",
     "papaparse": "^5.5.3"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.7"
   }
 }

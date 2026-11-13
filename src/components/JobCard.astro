@@ -1,0 +1,70 @@
+---
+import { jobPath } from '../lib/paths.js';
+import { FOCUS } from '../lib/taxonomy.js';
+
+const { job, rank } = Astro.props;
+const MAX_SKILLS = 5;
+const skills = job.skills.slice(0, MAX_SKILLS);
+const moreSkills = job.skills.length - skills.length;
+const eligibilityDiffers = job.nationality.known && !job.nationality.isStandard;
+---
+
+<li
+  class={`card focus-${job.focus}`}
+  id={`job-${job.id}`}
+  data-id={job.id}
+  data-rank={rank}
+  data-focus={job.focus}
+  data-disc={job.disciplines.map((d) => d.id).join(' ')}
+  data-site={job.site.id}
+  data-dir={job.directorate}
+  data-closes={job.closesAt ?? ''}
+  data-posted={job.postedAt ?? ''}
+  data-nat={job.nationality.codes.join(' ')}
+  data-ec={job.exportControl ? '1' : '0'}
+  data-headline={job.headline}
+  data-url={job.url}
+>
+  <article>
+    <div class="card-top">
+      <span class={`focus-tag focus-${job.focus}`}>{FOCUS[job.focus].label}</span>
+      <span class="deadline js-status" data-closes={job.closesAt ?? ''}>
+        <svg viewBox="0 0 16 16" aria-hidden="true" class="icon"><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.5"></circle><path d="M8 4.6V8l2.3 1.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+        <span class="status-date">{job.closesDay ? `Closes ${job.closesDay}` : 'No closing date'}</span>
+        <span class="status-rel"></span>
+      </span>
+      <button class="star" type="button" data-shortlist-toggle={job.id} data-shortlist-name={job.headline} aria-pressed="false" aria-label={`Add “${job.headline}” to shortlist`} title="Add to shortlist">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.6l2.2 4.6 5 .6-3.7 3.5.9 5-4.4-2.4-4.4 2.4.9-5L2.8 7.8l5-.6z"></path></svg>
+      </button>
+    </div>
+
+    <h3 class="card-title"><a href={jobPath(job.id)}>{job.headline}</a></h3>
+    {(job.department || job.unit) && (
+      <p class="card-org">{[job.department, job.unit].filter(Boolean).join(' · ')}</p>
+    )}
+    <p class="card-meta">
+      <span class="meta-item">
+        <svg viewBox="0 0 16 16" aria-hidden="true" class="icon"><path d="M8 14.5s4.8-4.4 4.8-8a4.8 4.8 0 10-9.6 0c0 3.6 4.8 8 4.8 8z" fill="none" stroke="currentColor" stroke-width="1.5"></path><circle cx="8" cy="6.4" r="1.7" fill="currentColor"></circle></svg>
+        {job.site.label}
+      </span>
+      <span class="meta-item">{job.directorate}</span>
+    </p>
+    {job.summary && <p class="card-summary">{job.summary}</p>}
+    <p class="card-snippet" hidden></p>
+
+    <ul class="chips" aria-label="Fields and skills">
+      {job.disciplines.map((d) => (
+        <li class={`chip ${d.technical ? 'chip-tech' : 'chip-nontech'}`}>{d.label}</li>
+      ))}
+      {skills.map((s) => <li class="chip chip-skill">{s}</li>)}
+      {moreSkills > 0 && <li class="chip chip-skill chip-more">+{moreSkills}</li>}
+    </ul>
+
+    {(job.exportControl || eligibilityDiffers) && (
+      <p class="card-flags">
+        {job.exportControl && <span class="flag flag-ec">Export-control eligibility required</span>}
+        {eligibilityDiffers && <span class="flag">Eligible nationalities differ from the usual list</span>}
+      </p>
+    )}
+  </article>
+</li>
